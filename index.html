@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAG PDF Mentor | Master Your Documents</title>
+    <meta name="description" content="AI-powered PDF mentor that answers your questions and identifies your knowledge gaps using RAG technology." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app">
+      <div class="glass-container">
+        <aside class="sidebar">
+          <div class="logo">
+            <span class="logo-icon">💠</span>
+            <h1>PDF Mentor</h1>
+          </div>
+
+          <div class="sidebar-progress-container">
+            <div class="progress-line"></div>
+            
+            <!-- Step 1: Upload -->
+            <div class="sidebar-step active" id="step-1">
+              <div class="step-badge">1</div>
+              <div class="step-content">
+                <div class="section-title">Source Document</div>
+                <div id="drop-zone" class="drop-zone">
+                  <div class="drop-content">
+                    <span class="drop-icon">📄</span>
+                    <p>Drag PDF here</p>
+                    <input type="file" id="file-input" accept="application/pdf" hidden />
+                  </div>
+                </div>
+                <div id="doc-info" class="doc-info hidden">
+                  <div class="doc-name">No document</div>
+                  <div class="doc-stats">0 pages</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Configuration -->
+            <div class="sidebar-step disabled" id="step-2">
+              <div class="step-badge">2</div>
+              <div class="step-content">
+                <div class="section-title">AI Engine</div>
+                <div class="config-grid">
+                  <select id="backend-mode" class="primary-select">
+                      <option value="browser">Browser Mode</option>
+                      <option value="springboot">Spring Boot</option>
+                      <option value="nodejs">Node.js</option>
+                      <option value="python">Python</option>
+                  </select>
+
+                  <div id="ai-provider-section">
+                    <div class="toggle-wrapper">
+                      <label class="switch">
+                        <input type="checkbox" id="provider-toggle" />
+                        <span class="slider round"></span>
+                      </label>
+                      <span id="provider-label">Gemini Cloud</span>
+                    </div>
+                  </div>
+
+                  <select id="model-select" class="primary-select"></select>
+
+                  <div class="api-key-section hidden" id="api-key-container">
+                    <div class="input-wrapper">
+                      <input type="password" id="api-key" placeholder="Gemini Key..." />
+                      <button id="save-key">✓</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Analysis -->
+            <div class="sidebar-step disabled" id="step-3">
+              <div class="step-badge">3</div>
+              <div class="step-content">
+                <div class="section-title">RAG Analysis</div>
+                <button id="analyze-doc-btn" class="analyze-btn" disabled>
+                  <span>Inject Intelligence</span>
+                  <div class="btn-shine"></div>
+                </button>
+                <p id="analysis-status" class="status-helper">Setup required</p>
+              </div>
+            </div>
+
+            <!-- Step 4: Insights -->
+            <div class="sidebar-step disabled" id="step-4">
+              <div class="step-badge">4</div>
+              <div class="step-content">
+                <div class="section-title">Mastery Center</div>
+                <div id="topics-list" class="topics-list"></div>
+                <div class="action-grid">
+                  <button id="view-summary-btn" class="glass-btn" disabled>✨ Summary</button>
+                  <button id="take-quiz-btn" class="glass-btn secondary" disabled>🎯 Quiz</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="chat-container">
+          <header class="chat-header">
+            <div class="header-info">
+              <h2 id="status-text">Your Learning Mentor</h2>
+              <div id="processing-indicator" class="processing hidden">
+                <div class="dot-flashing"></div>
+                <span>Teacher is thinking...</span>
+              </div>
+            </div>
+          </header>
+
+          <div id="chat-messages" class="chat-messages">
+            <div class="message system">
+              <div class="message-content">
+                Namaste! I'm your Teacher. Upload a PDF, choose your brain (local or cloud), and we'll start learning together!
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div class="section-title" style="margin-bottom: 10px; color: var(--accent-secondary); display: flex; align-items: center; gap: 12px;">
+              Doubt Clarification Center
+              <div id="processing-indicator" class="processing inline-dots hidden">
+                <div class="dot-flashing"></div>
+              </div>
+            </div>
+            <div class="input-container">
+              <textarea id="user-input" placeholder="Ask your doubt here..." rows="1"></textarea>
+              <button id="send-btn" disabled>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Challenge Modal -->
+    <div id="challenge-modal" class="modal-overlay hidden">
+      <div class="modal-content glass-container">
+        <button id="close-modal" class="close-btn">&times;</button>
+        <div class="modal-body">
+          <p class="challenge-title">🎯 Knowledge Challenge</p>
+          <p class="challenge-desc">Let's see how well you know the document!</p>
+          <div id="modal-challenges-list" class="challenges-list"></div>
+          <button id="start-chat-btn" class="primary-btn">Continue to Chat</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="summary-modal" class="modal-overlay hidden">
+      <div class="modal-content glass-container summary-modal-content">
+        <button id="close-summary-modal" class="close-btn">&times;</button>
+        <div class="modal-body">
+          <div class="modal-header">
+            <p class="challenge-title">📖 Document Summary</p>
+          </div>
+          <div id="summary-content" class="summary-text-box"></div>
+          <div class="modal-footer">
+            <button id="summary-scroll-btn" class="scroll-down-btn hidden">↓</button>
+            <button id="close-summary-btn" class="primary-btn">Close Summary</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
